@@ -62,9 +62,31 @@ class RfamDataset(Dataset):
 
         print(f"Loaded {len(self.df)} sequences")
 
-        # Debug: Print column names
-        print(f"\nCSV columns found: {list(self.df.columns)}")
-        print(f"First row sample:\n{self.df.head(1).to_dict('records')[0] if len(self.df) > 0 else 'No data'}\n")
+        # Rename columns to standard format if needed
+        column_mapping = {
+            'Whole sequence': 'sequence',
+            'Whole structure': 'structure',
+            'Family': 'family',
+            # Also support already-formatted column names
+            'sequence': 'sequence',
+            'structure': 'structure',
+            'family': 'family',
+        }
+
+        # Find which columns we have and rename them
+        for old_name, new_name in column_mapping.items():
+            if old_name in self.df.columns:
+                self.df = self.df.rename(columns={old_name: new_name})
+
+        # Verify we have the required columns
+        if 'sequence' not in self.df.columns or 'structure' not in self.df.columns:
+            raise ValueError(
+                f"CSV must have 'sequence' and 'structure' columns (or 'Whole sequence' and 'Whole structure').\n"
+                f"Found columns: {list(self.df.columns)}"
+            )
+
+        print(f"Using columns: sequence='{[c for c in self.df.columns if 'sequence' in c.lower()][0]}', "
+              f"structure='{[c for c in self.df.columns if 'structure' in c.lower()][0]}'")
 
         # Filter by family if specified
         if filter_families is not None:
