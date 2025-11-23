@@ -1,0 +1,378 @@
+# RNA Structure Prediction Database Reference
+# Last Updated: 2025-10-28
+
+## PROJECT GOAL
+Predict RNA 3D structure from sequence
+- Phase 1: Master 2D secondary structure prediction (base pairing)
+- Phase 2: Move to 3D tertiary structure prediction (atomic coordinates)
+
+================================================================================
+DATASETS OVERVIEW
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ TRAINING DATA → VALIDATION DATA → TEST CASES                            │
+│                                                                          │
+│ Rfam.csv.gz  →  RNAsolo.csv.gz  →  5 PDB files                         │
+│ (13.5 MB)       (553 KB)           (individual structures)              │
+│                                                                          │
+│ Train model     Test on real       Final validation                     │
+│ on families     experiments        on key cases                         │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+DATASET 1: Rfam.csv.gz (PRIMARY TRAINING DATA)
+================================================================================
+
+FILE INFO:
+  Size: 13.5 MB (compressed)
+  Source: Rfam database (https://rfam.org/)
+  Type: RNA family consensus structures
+  
+EXPECTED CONTENT:
+  - RNA sequences (AUGC letters)
+  - 2D secondary structures (dot-bracket notation)
+  - RNA family classifications
+  - Estimated: 10,000 - 50,000 sequences
+  
+COLUMNS (expected):
+  - sequence: RNA nucleotide sequence
+  - structure: Dot-bracket notation of base pairs
+  - family: Rfam accession (e.g., RF00005)
+  - description: Family name/description
+  
+DOT-BRACKET NOTATION:
+  '(' = start of base pair
+  ')' = end of base pair
+  '.' = unpaired base
+  
+  Example:
+    Sequence:   GCGGAUUUAGCUCAG
+    Structure:  (((((.....))))
+    Meaning:    Bases 0-4 pair with bases 14-10
+
+USE FOR:
+  ✓ Primary training data (80% split)
+  ✓ Validation during training (10% split)
+  ✓ Initial testing (10% split)
+  ✓ Learning general RNA folding patterns
+  ✓ Cross-family generalization tests
+
+EXPECTED PERFORMANCE:
+  - Baseline (simple rules): F1 ~ 0.30-0.40
+  - Simple CNN: F1 ~ 0.70-0.80
+  - State-of-art: F1 ~ 0.85-0.95
+
+================================================================================
+DATASET 2: RNAsolo.csv.gz (EXPERIMENTAL VALIDATION DATA)
+================================================================================
+
+FILE INFO:
+  Size: 553 KB (compressed)
+  Source: RNAsolo database (http://rnasolo.cs.put.poznan.pl/)
+  Type: Experimentally solved 3D structures from PDB
+  
+EXPECTED CONTENT:
+  - RNA sequences extracted from 3D structures
+  - 2D structures derived from 3D atomic contacts
+  - PDB identifiers for cross-reference
+  - Estimated: 500 - 1,500 structures
+  
+COLUMNS (expected):
+  - pdb_id: PDB identifier (e.g., '1RNA', '2TPK')
+  - sequence: RNA nucleotide sequence
+  - structure: 2D structure derived from 3D
+  - resolution: X-ray/NMR resolution (Å)
+  - method: Experimental method
+  - organism: Source organism
+  
+WHY THIS IS IMPORTANT:
+  - These are REAL experimental structures
+  - "Ground truth" from actual crystallography/NMR
+  - Tests if model works on experimental data
+  - More reliable than purely computational structures
+
+USE FOR:
+  ✓ Independent test set (don't train on this!)
+  ✓ Check for overfitting to Rfam
+  ✓ Validation on experimental data
+  ✓ Identify systematic errors
+
+EXPECTED PERFORMANCE:
+  - Often slightly LOWER than Rfam test set
+  - If F1 drops >10%, you're overfitting
+  - Target: F1 > 0.70
+
+================================================================================
+DATASET 3: YOUR 5 PDB TEST CASES (FINAL VALIDATION)
+================================================================================
+
+These are specific, biologically important structures for final testing.
+Ordered by difficulty:
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ TEST CASE 1: 1rna.pdb                                                   │
+│ ████ EASY (Baseline Test)                                               │
+├─────────────────────────────────────────────────────────────────────────┤
+│ NAME:        RNA Double Helix                                           │
+│ LENGTH:      ~10-12 base pairs                                          │
+│ TYPE:        A-form RNA helix (basic structure)                         │
+│ COMPLEXITY:  Simple Watson-Crick base pairing only                      │
+│ PDB URL:     https://www.rcsb.org/structure/1rna                        │
+│                                                                          │
+│ WHY IMPORTANT:                                                          │
+│   - Fundamental RNA structure                                           │
+│   - Test basic base pairing prediction                                  │
+│   - Should get near 100% accuracy                                       │
+│                                                                          │
+│ STRUCTURE:   Just stacked base pairs, no loops or bulges                │
+│ CHALLENGE:   None - this is a sanity check                              │
+│                                                                          │
+│ TARGET F1:   > 0.95                                                     │
+│ IF YOU FAIL: Model is fundamentally broken                              │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ TEST CASE 2: 2tpk.pdb                                                   │
+│ ██████ MEDIUM (Standard Benchmark)                                      │
+├─────────────────────────────────────────────────────────────────────────┤
+│ NAME:        Transfer RNA (tRNA)                                        │
+│ LENGTH:      ~75 nucleotides                                            │
+│ TYPE:        Classic L-shaped tRNA structure                            │
+│ COMPLEXITY:  Multiple hairpin loops, some non-standard pairs            │
+│ PDB URL:     https://www.rcsb.org/structure/2tpk                        │
+│                                                                          │
+│ WHY IMPORTANT:                                                          │
+│   - The "MNIST of RNA" - standard benchmark                             │
+│   - Well-studied, lots of reference data                                │
+│   - Every RNA tool gets tested on tRNA                                  │
+│                                                                          │
+│ STRUCTURE:                                                              │
+│   - Cloverleaf 2D structure                                             │
+│   - 4 main stems/loops                                                  │
+│   - Some modified bases (might be tricky)                               │
+│                                                                          │
+│ CHALLENGE:   Modified bases, non-Watson-Crick pairs                     │
+│                                                                          │
+│ TARGET F1:   > 0.80                                                     │
+│ IF YOU FAIL: Not competitive with existing methods                      │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ TEST CASE 3: 1ebq.pdb                                                   │
+│ ████████ HARD (Drug Target)                                             │
+├─────────────────────────────────────────────────────────────────────────┤
+│ NAME:        HIV Rev Response Element (RRE)                             │
+│ LENGTH:      ~60-70 nucleotides                                         │
+│ TYPE:        RNA-protein binding site                                   │
+│ COMPLEXITY:  Complex hairpin with bulges and internal loops             │
+│ PDB URL:     https://www.rcsb.org/structure/1ebq                        │
+│                                                                          │
+│ WHY IMPORTANT:                                                          │
+│   - Critical for HIV replication                                        │
+│   - Pharmaceutical drug target                                          │
+│   - Irregular structure hard to predict                                 │
+│                                                                          │
+│ STRUCTURE:                                                              │
+│   - Asymmetric internal loop (IIB)                                      │
+│   - Bulges and mismatches                                               │
+│   - Non-canonical G-A and G-G pairs                                     │
+│   - Binds HIV Rev protein                                               │
+│                                                                          │
+│ CHALLENGE:                                                              │
+│   - Non-standard base pairs                                             │
+│   - Irregular loop geometry                                             │
+│   - Context-dependent structure                                         │
+│                                                                          │
+│ TARGET F1:   > 0.70                                                     │
+│ IF YOU FAIL: Expected - this is hard for everyone                       │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ TEST CASE 4: 4xw7.pdb                                                   │
+│ ██████████ VERY HARD (Cutting Edge)                                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│ NAME:        Riboswitch (SAM-I type)                                    │
+│ LENGTH:      ~100+ nucleotides                                          │
+│ TYPE:        Ligand-sensing regulatory RNA                              │
+│ COMPLEXITY:  Multi-domain with PSEUDOKNOTS                              │
+│ PDB URL:     https://www.rcsb.org/structure/4xw7                        │
+│                                                                          │
+│ WHY IMPORTANT:                                                          │
+│   - Gene regulation without proteins                                    │
+│   - Changes shape when molecule binds                                   │
+│   - Potential antibiotic target                                         │
+│   - Has pseudoknots (crossing base pairs)                               │
+│                                                                          │
+│ STRUCTURE:                                                              │
+│   - Multiple structural domains                                         │
+│   - Binding pocket for ligand (SAM)                                     │
+│   - PSEUDOKNOTS: Base pairs that cross over                             │
+│   - Long-range tertiary interactions                                    │
+│                                                                          │
+│ CHALLENGE:                                                              │
+│   - PSEUDOKNOTS: Can't represent in simple dot-bracket                  │
+│   - Most 2D predictors fail on pseudoknots                              │
+│   - Requires 3D information or extended notation                        │
+│                                                                          │
+│ PSEUDOKNOT EXAMPLE:                                                     │
+│   Sequence:  AAACCCGGG                                                  │
+│   Structure: (([...]]]  ← Crossing pairs!                               │
+│   Can't do: (((...)))  ← Regular nested only                            │
+│                                                                          │
+│ TARGET F1:   > 0.60                                                     │
+│ IF YOU FAIL: Standard - pseudoknots are frontier research               │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ TEST CASE 5: 1kxk.pdb                                                   │
+│ ████████████████ EXTREMELY HARD (Research Frontier)                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│ NAME:        Group II Self-Splicing Intron                              │
+│ LENGTH:      Several hundred nucleotides                                │
+│ TYPE:        Catalytic RNA (Ribozyme)                                   │
+│ COMPLEXITY:  Massive multi-domain enzyme-like structure                 │
+│ PDB URL:     https://www.rcsb.org/structure/1kxk                        │
+│                                                                          │
+│ WHY IMPORTANT:                                                          │
+│   - RNA acting as enzyme (cuts itself out)                              │
+│   - Evolutionary relic (primitive catalysis)                            │
+│   - Extreme structural complexity                                       │
+│                                                                          │
+│ STRUCTURE:                                                              │
+│   - 6 major structural domains (D1-D6)                                  │
+│   - Hundreds of base pairs                                              │
+│   - Long-range tertiary contacts                                        │
+│   - Metal ion binding sites                                             │
+│   - Pseudoknots throughout                                              │
+│                                                                          │
+│ CHALLENGE:                                                              │
+│   - Size: Too large for many algorithms                                 │
+│   - Long-range interactions (>100 nt apart)                             │
+│   - Tertiary structure dominates                                        │
+│   - Need 3D modeling, 2D alone insufficient                             │
+│   - Metal ions affect structure                                         │
+│                                                                          │
+│ TARGET F1:   > 0.50                                                     │
+│ IF YOU FAIL: EXPECTED - this is an open research problem                │
+│                                                                          │
+│ NOTE: If you get >60% on this, write a paper immediately                │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+PERFORMANCE TARGETS SUMMARY
+================================================================================
+
+MODEL STAGE          | 1rna | 2tpk | 1ebq | 4xw7 | 1kxk | Rfam
+--------------------------------------------------------------------------------
+Baseline (rules)     | 0.95 | 0.40 | 0.20 | 0.10 | 0.10 | 0.30
+Simple CNN           | 0.99 | 0.75 | 0.55 | 0.40 | 0.30 | 0.75
+Good CNN/Transformer | 0.99 | 0.85 | 0.70 | 0.50 | 0.40 | 0.85
+State-of-Art         | 0.99 | 0.90 | 0.80 | 0.65 | 0.55 | 0.90
+
+YOUR REALISTIC GOAL: Match "Good CNN/Transformer" row
+
+================================================================================
+TESTING PROGRESSION
+================================================================================
+
+WEEK 1: Setup & Baseline
+  [ ] Load Rfam.csv.gz
+  [ ] Explore data format
+  [ ] Implement baseline predictor
+  [ ] Test on simple examples (GCGC...)
+  [ ] Expected F1: 0.30-0.40
+
+WEEK 2: Train on Rfam
+  [ ] Split Rfam: 80% train, 10% val, 10% test
+  [ ] Build simple CNN
+  [ ] Train and validate
+  [ ] Test on Rfam test set
+  [ ] Target F1: > 0.75
+
+WEEK 3: Validate on RNAsolo
+  [ ] Test on RNAsolo (don't train on it!)
+  [ ] Compare to Rfam performance
+  [ ] Diagnose any overfitting
+  [ ] Target F1: > 0.70
+
+WEEK 4: Test on PDB Cases
+  [ ] Extract sequences from 1rna.pdb, 2tpk.pdb
+  [ ] Test 1rna.pdb (should pass easily)
+  [ ] Test 2tpk.pdb (main benchmark)
+  [ ] Test 1ebq.pdb (stretch goal)
+  [ ] Document failures on 4xw7, 1kxk
+
+WEEK 5: Analysis & Writeup
+  [ ] Compare to existing tools (RNAfold, UFold)
+  [ ] Analyze failure modes
+  [ ] Visualize predictions vs truth
+  [ ] Write up results
+
+================================================================================
+FILE LOCATIONS (when you get them)
+================================================================================
+
+/datasets/
+  ├── Rfam.csv.gz           # Primary training data (13.5 MB)
+  ├── RNAsolo.csv.gz        # Validation data (553 KB)
+  └── README.md             # Dataset documentation
+
+/pdb_structures/
+  ├── 1rna.pdb              # Test case 1: Easy
+  ├── 2tpk.pdb              # Test case 2: Medium
+  ├── 1ebq.pdb              # Test case 3: Hard
+  ├── 4xw7.pdb              # Test case 4: Very hard
+  └── 1kxk.pdb              # Test case 5: Extremely hard
+
+/results/
+  ├── RF00009.csv.gz        # Results for specific RNA families
+  ├── RF01739.csv.gz        # Glutamine riboswitch results
+  └── RF02681.csv.gz        # Other family results
+
+/notebooks/
+  ├── recognizing-glutamine-riboswitch.ipynb
+  └── wilcoxon-tests.ipynb  # Statistical tests
+
+================================================================================
+BENCHMARK COMPARISON
+================================================================================
+
+Compare your results against these existing tools:
+
+TOOL          | Type          | Rfam F1 | 2tpk F1 | Speed  | Notes
+--------------------------------------------------------------------------
+RNAfold       | Thermodynamic | 0.85    | 0.88    | Fast   | Baseline
+UFold         | Deep Learning | 0.90    | 0.92    | Medium | Current best
+ERNIE-RNA     | Transformer   | 0.92    | 0.93    | Slow   | SOTA
+CONTRAfold    | ML+Energy     | 0.82    | 0.85    | Medium | Classic
+Your Model    | ???           | ???     | ???     | ???    | TBD!
+
+================================================================================
+EVALUATION METRICS
+================================================================================
+
+PRIMARY METRIC: F1 Score
+  F1 = 2 * (Precision * Recall) / (Precision + Recall)
+  
+  - Precision (PPV): Of predicted pairs, how many are correct?
+  - Recall (Sensitivity): Of true pairs, how many did we find?
+  - F1: Harmonic mean (balanced accuracy)
+
+ALSO REPORT:
+  - Matthews Correlation Coefficient (MCC)
+  - Per-structure accuracy
+  - Per-family performance (on Rfam)
+  - Failure analysis by structure type
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Load Rfam.csv.gz and explore it
+2. Run the rna_2d_predictor.py baseline
+3. Install RNAfold to see state-of-art performance
+4. Start building your CNN model
+
+
+================================================================================
