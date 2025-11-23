@@ -15,12 +15,20 @@ RNA_VOCAB = {
     '<PAD>': 4,
 }
 
-# Structure vocabulary (dot-bracket notation)
+# Structure vocabulary (extended dot-bracket notation)
+# Supports pseudoknots and multiple pairing types
 STRUCTURE_VOCAB = {
-    '.': 0,  # Unpaired
-    '(': 1,  # Opening pair
-    ')': 2,  # Closing pair
-    '<PAD>': 3,
+    '.': 0,   # Unpaired
+    '-': 1,   # Gap/deletion
+    '(': 2,   # Opening pair type 1
+    ')': 3,   # Closing pair type 1
+    '[': 4,   # Opening pair type 2 (pseudoknots)
+    ']': 5,   # Closing pair type 2
+    '{': 6,   # Opening pair type 3
+    '}': 7,   # Closing pair type 3
+    '<': 8,   # Opening pair type 4
+    '>': 9,   # Closing pair type 4
+    '<PAD>': 10,
 }
 
 # Reverse mappings
