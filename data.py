@@ -15,7 +15,7 @@ from torch.utils.data import Dataset
 from typing import List, Tuple, Optional, Dict
 import numpy as np
 
-from .utils import (
+from utils import (
     encode_rna_sequence,
     encode_structure,
     RNA_VOCAB,

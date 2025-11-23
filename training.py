@@ -13,7 +13,7 @@ import torch.nn.functional as F
 from typing import Optional, Tuple, Dict, Any
 import random
 
-from .model import HRM
+from model import HRM
 
 
 class HRMTrainer:

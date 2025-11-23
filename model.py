@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 from typing import Optional, Tuple
 
-from .modules import InputEmbedding, LModule, HModule, OutputHead, QHead
+from modules import InputEmbedding, LModule, HModule, OutputHead, QHead
 
 
 class HRM(nn.Module):
