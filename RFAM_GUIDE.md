@@ -5,8 +5,8 @@ This guide shows you how to train the HRM architecture on your Rfam dataset for 
 ## Prerequisites
 
 Your data folder should contain:
-- `Rfam.csv.gz` (13.5 MB) - Primary training data
-- Optionally: `RNAsolo.csv.gz`, PDB files for testing
+- `Rfam.csv` (13.5 MB) - Primary training data
+- Optionally: `RNAsolo.csv`, PDB files for testing
 
 ## Step 1: Install Dependencies
 
@@ -27,7 +27,7 @@ This installs:
 Before training, explore your Rfam dataset to understand its structure:
 
 ```bash
-python examples/explore_rfam.py --data_path /path/to/your/data/Rfam.csv.gz
+python examples/explore_rfam.py --data_path /path/to/your/data/Rfam.csv
 ```
 
 This will show:
@@ -41,7 +41,7 @@ This will show:
 ```
 Rfam Dataset Exploration
 ================================================================================
-Loading data from /path/to/Rfam.csv.gz...
+Loading data from /path/to/Rfam.csv...
 Loaded 45000 sequences
 ...
 Dataset Statistics:
@@ -58,7 +58,7 @@ Dataset Statistics:
 
 ```bash
 python examples/train_rfam.py \
-  --data_path /path/to/your/data/Rfam.csv.gz \
+  --data_path /path/to/your/data/Rfam.csv \
   --dim 128 \
   --n_epochs 10 \
   --batch_size 16 \
@@ -81,7 +81,7 @@ python examples/train_rfam.py \
 
 ```bash
 python examples/train_rfam.py \
-  --data_path /path/to/your/data/Rfam.csv.gz \
+  --data_path /path/to/your/data/Rfam.csv \
   --dim 256 \
   --n_heads 8 \
   --n_cycles 3 \
@@ -251,7 +251,7 @@ Validate on experimental structures:
 
 ```bash
 python examples/train_rfam.py \
-  --data_path /path/to/your/data/RNAsolo.csv.gz \
+  --data_path /path/to/your/data/RNAsolo.csv \
   --explore_only  # First explore the data
 ```
 
@@ -279,11 +279,11 @@ Then compare your HRM predictions to RNAfold predictions.
 
 ## Troubleshooting
 
-### Error: "FileNotFoundError: Rfam.csv.gz"
+### Error: "FileNotFoundError: Rfam.csv"
 
 Make sure you provide the full path:
 ```bash
-python examples/train_rfam.py --data_path /home/user/data/Rfam.csv.gz
+python examples/train_rfam.py --data_path /home/user/data/Rfam.csv
 ```
 
 ### Error: "CUDA out of memory"

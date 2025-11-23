@@ -2,7 +2,7 @@
 Train HRM on Rfam dataset for RNA 2D structure prediction.
 
 This script:
-1. Loads Rfam.csv.gz data
+1. Loads Rfam.csv data
 2. Splits into train/val/test sets (80/10/10)
 3. Trains HRM with deep supervision and ACT
 4. Evaluates on test set with F1, Precision, Recall, MCC
@@ -10,7 +10,7 @@ This script:
 6. Saves best model
 
 Usage:
-    python examples/train_rfam.py --data_path /path/to/Rfam.csv.gz
+    python examples/train_rfam.py --data_path /path/to/Rfam.csv
 """
 
 import argparse
@@ -39,7 +39,7 @@ def parse_args():
 
     # Data
     parser.add_argument('--data_path', type=str, required=True,
-                        help='Path to Rfam.csv.gz file')
+                        help='Path to Rfam.csv file')
     parser.add_argument('--min_length', type=int, default=10,
                         help='Minimum sequence length')
     parser.add_argument('--max_length', type=int, default=512,

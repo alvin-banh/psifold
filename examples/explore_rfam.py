@@ -2,7 +2,7 @@
 Explore Rfam dataset structure and statistics.
 
 Usage:
-    python examples/explore_rfam.py --data_path /path/to/Rfam.csv.gz
+    python examples/explore_rfam.py --data_path /path/to/Rfam.csv
 """
 
 import argparse
@@ -17,7 +17,7 @@ from psifold.data import explore_rfam_data
 def parse_args():
     parser = argparse.ArgumentParser(description='Explore Rfam dataset')
     parser.add_argument('--data_path', type=str, required=True,
-                        help='Path to Rfam.csv.gz file')
+                        help='Path to Rfam.csv file')
     return parser.parse_args()
 
 
