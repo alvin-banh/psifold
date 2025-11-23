@@ -27,7 +27,7 @@ This installs:
 Before training, explore your Rfam dataset to understand its structure:
 
 ```bash
-python examples/explore_rfam.py --data_path /path/to/your/data/Rfam.csv
+python examples/explore_rfam.py --data_path data/Rfam.csv
 ```
 
 This will show:
@@ -56,13 +56,25 @@ Dataset Statistics:
 
 ### Quick Start (Small Model for Testing)
 
+bash:
 ```bash
 python examples/train_rfam.py \
-  --data_path /path/to/your/data/Rfam.csv \
+  --data_path data/Rfam.csv \
   --dim 128 \
   --n_epochs 10 \
   --batch_size 16 \
   --max_length 256 \
+  --output_dir ./outputs/quick_test
+```
+
+powershell:
+```bash
+python examples/train_rfam.py `
+  --data_path data/Rfam.csv `
+  --dim 128 `
+  --n_epochs 10 `
+  --batch_size 16 `
+  --max_length 256 `
   --output_dir ./outputs/quick_test
 ```
 
