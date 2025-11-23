@@ -11,7 +11,7 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from psifold.data import explore_rfam_data
+from data import explore_rfam_data
 
 
 def parse_args():
