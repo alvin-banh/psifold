@@ -2,9 +2,10 @@
 Data loading and preprocessing for RNA structure datasets.
 
 Supports:
-- Rfam.csv.gz (primary training data)
-- RNAsolo.csv.gz (experimental validation data)
+- Rfam.csv (primary training data)
+- RNAsolo.csv (experimental validation data)
 - Custom CSV formats
+- Both .csv and .csv.gz files supported
 """
 
 import gzip
