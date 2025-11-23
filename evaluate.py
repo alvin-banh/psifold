@@ -14,7 +14,7 @@ import numpy as np
 from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 
-from .utils import decode_structure, STRUCTURE_VOCAB
+from utils import decode_structure, STRUCTURE_VOCAB
 
 
 @dataclass
