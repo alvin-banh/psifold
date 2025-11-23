@@ -22,16 +22,15 @@ from torch.utils.data import DataLoader
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from psifold import HRM, HRMTrainer
-from psifold.model import HRMConfig
-from psifold.training import create_optimizer, LRScheduler
-from psifold.data import RfamDataset, collate_rna_batch, explore_rfam_data
-from psifold.evaluate import (
+from model import HRM, HRMConfig
+from training import HRMTrainer, create_optimizer, LRScheduler
+from data import RfamDataset, collate_rna_batch, explore_rfam_data
+from evaluate import (
     StructureEvaluator,
     benchmark_comparison,
     print_prediction_examples,
 )
-from psifold.utils import RNA_VOCAB, STRUCTURE_VOCAB
+from utils import RNA_VOCAB, STRUCTURE_VOCAB
 
 
 def parse_args():
@@ -397,7 +396,7 @@ def main():
         pred_tokens = y_hat.argmax(dim=-1)
 
     # Get sequence strings
-    from psifold.utils import decode_rna_sequence
+    from utils import decode_rna_sequence
     seq_strings = [decode_rna_sequence(s.cpu().tolist()[:l.item()])
                    for s, l in zip(sequences, lengths)]
 
