@@ -62,6 +62,10 @@ class RfamDataset(Dataset):
 
         print(f"Loaded {len(self.df)} sequences")
 
+        # Debug: Print column names
+        print(f"\nCSV columns found: {list(self.df.columns)}")
+        print(f"First row sample:\n{self.df.head(1).to_dict('records')[0] if len(self.df) > 0 else 'No data'}\n")
+
         # Filter by family if specified
         if filter_families is not None:
             if 'family' in self.df.columns:
