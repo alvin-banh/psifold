@@ -62,10 +62,20 @@ class RotaryPositionalEmbedding(nn.Module):
     def _apply_rotary_emb(x: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> torch.Tensor:
         # x: [batch, seq_len, n_heads, head_dim]
         # cos, sin: [seq_len, head_dim]
+
+        # Add n_heads dimension: [seq_len, head_dim] -> [1, seq_len, 1, head_dim]
+        cos = cos.unsqueeze(0).unsqueeze(2)
+        sin = sin.unsqueeze(0).unsqueeze(2)
+
+        # Split into first and second half
         x1, x2 = x[..., : x.shape[-1] // 2], x[..., x.shape[-1] // 2 :]
+        cos1, cos2 = cos[..., : cos.shape[-1] // 2], cos[..., cos.shape[-1] // 2 :]
+        sin1, sin2 = sin[..., : sin.shape[-1] // 2], sin[..., sin.shape[-1] // 2 :]
+
+        # Apply rotation
         return torch.cat([
-            x1 * cos - x2 * sin,
-            x1 * sin + x2 * cos
+            x1 * cos1 - x2 * sin1,
+            x1 * sin2 + x2 * cos2
         ], dim=-1)
 
 
